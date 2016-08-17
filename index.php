@@ -185,7 +185,7 @@
 						  $to = $feed_user_email;
 						  $subject = 'Alerts For: '.$feed_category_name;
 						  
-						  $url ="192.168.0.54:8093/emailer.html";
+						  $url = $_SERVER['HTTP_HOST']."/emailer.html";
 						  $ch = curl_init();
 						  curl_setopt ($ch, CURLOPT_URL, $url);
 						  curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
