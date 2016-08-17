@@ -1,5 +1,4 @@
 <?php
- 	
     include_once("feeds.php");
     include_once("database.php");
 	
@@ -17,6 +16,8 @@
  	{
 		 foreach($categories as $category)
 		 {
+			   $email_data = '';
+			   
 			   $feed_category_id = $category['feed_category_id'];
 			   $feed_category_name = $category['feed_category_name'];
 			   $feed_user_name = $category['feed_user_name'];
@@ -35,6 +36,9 @@
 					
 							$content=file_get_contents($alert_url);
 							$feed_content = new SimpleXmlElement($content);
+							
+							$feed_keywords = array();
+							$feed_keywords = $db_obj->get_feed_keywords($alert_id);
 					
 							if(isset($feed_content->updated))
 							{
@@ -48,8 +52,6 @@
 								   {
 									  $updated_rows = $feeds_obj->update_alert_updated_date($alert_id, $alert_updated_date);
 								   }
-							
-								   $feed_keywords = $db_obj->get_feed_keywords($alert_id);
 					  
 								   foreach($feed_content->entry as $feed)
 								   {
@@ -75,12 +77,34 @@
 										   {
 											   $keyword = strtolower($keywords['feed_keyword']);
 											   $keyword_priority = $keywords['feed_keyword_priority'];
-											   if(strpos(strtolower($feed_content), $keyword) !== false)
+											   
+											   if($keyword == 'Deprecat')
 											   {
-												  $feed_priority = $keyword_priority;
-												  $keyword_match = 1;
-												  break;
+											      if(preg_match("/\bDeprecat[a-zA-Z]\b/i", addslashes($feed_content), $match))
+											      {
+											         $feed_priority = $keyword_priority;
+													 $keyword_match = 1;
+													 break;
+											      }
 											   }
+											   else if($keyword == 'v')
+											   {
+											       if(preg_match("/\bv[\d]\b/i", addslashes($feed_content), $match))
+											       {
+											          $feed_priority = $keyword_priority;
+													  $keyword_match = 1;
+													  break;
+											       }
+											   }
+											   else
+											   {
+												   if(strpos(strtolower(addslashes($feed_content)), $keyword) !== false)
+												   {
+													  $feed_priority = $keyword_priority;
+													  $keyword_match = 1;
+													  break;
+												   }
+											   }	   
 										
 										   }
 									   }
@@ -93,7 +117,6 @@
 											  $updated_date = date("Y-m-d h:i:sa");
 											  $feed_update_array = array($feed_title, $feed_link, $feed_content, $feed_published_date, $feed_updated_date, $feed_priority, 1, $keyword_match, $updated_date, $rss_feed_id, $alert_id);	
 											  $feed_updated_count = $feeds_obj->insert_update_feeds($rss_feed_id, $alert_id, $feed_update_array, 'udpate');
-											  echo $feed_updated_count;
 										  }
 									   }
 									   else
@@ -103,11 +126,99 @@
 										  $updated_date = date("Y-m-d h:i:sa");
 										  $feed_insert_array = array($rss_feed_id, $alert_id, $feed_category_id, $feed_category_name, $feed_title, $feed_link, $feed_content, $feed_published_date, $feed_updated_date, $feed_priority, 1, $keyword_match, $created_date, $updated_date);
 										  $feed_inserted_count = $feeds_obj->insert_update_feeds('','',$feed_insert_array, 'insert');
-										  echo $feed_inserted_count;
 									   }
 								   }
 							}
 					  }
+			    }
+			   
+			   if(isset($feed_alerts) && count($feed_alerts) > 0)
+			   {
+			        $feed_category_user = $db_obj->get_feed_category_user($feed_category_id);
+			        $feed_user_name = $feed_category_user[0]['feed_user_name'];
+			        $feed_user_email = $feed_category_user[0]['feed_user_email'];
+			        
+			        foreach($feed_alerts as $alert)
+			        {
+						  $alert_id = $alert['alert_id'];
+						  $alert_url = $alert['alert_url'];
+						  $alert_url_title = $alert['alert_url_title'];
+						
+						  $new_feeds = $feeds_obj->get_all_feeds_per_alert($alert_id);
+						  
+						  if(isset($new_feeds) && count($new_feeds) > 0)
+						  {
+								$email_data .= '<table border="0" cellspacing="0" cellpadding="0">';
+								   $email_data .= '<tr>
+													   <td style="padding-bottom: 10px; font-weight: normal; font-size: 15px; line-height: 18px;  font-family: Arial; color: #757067;">'.$alert_url_title.'</td>
+												   </tr>';
+								
+								foreach($new_feeds as $feeds)
+								{
+									  $feed_title = $feeds['feed_title'];
+									  $link = explode("&", $feeds['feed_link'])[2];
+									  $feed_link = explode("=", $link)[1];
+									  $feed_content = $feeds['feed_content'];
+									  $keyword_match = $feeds['keyword_match'];
+								  
+									  $color = '';
+									  if($keyword_match == 1)
+									  {
+										$color = "red";
+									  }
+								  
+									  $email_data .= '<tr>
+														  <td style="padding-bottom: 4px; font-weight: normal; font-size: 11px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'">'.$feed_content.'</td>
+													  </tr>
+
+													  <tr>
+														  <td style="padding-bottom: 10px; color: #d7d1c7;"><a href="'.$feed_link.'" target="_blank" style="font-weight: normal; font-size: 11px; line-height: 15px; font-family: Arial; color: #b18910; text-transform: uppercase; text-decoration: none;">VIEW DETAILS</a></td>
+													  </tr>';
+								}
+								
+								$email_data .= '</table>';
+						  }
+			        }
+			        
+			        if($email_data != '')
+					{
+						  $to = $feed_user_email;
+						  $subject = 'Alerts For: '.$feed_category_name;
+						  
+						  $url ="192.168.0.54:8093/emailer.html";
+						  $ch = curl_init();
+						  curl_setopt ($ch, CURLOPT_URL, $url);
+						  curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
+						  curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+						  $contents = curl_exec($ch);
+						  if (curl_errno($ch)) {
+							  $contents = '';
+						  } else {
+							  curl_close($ch);
+						  }
+
+						  if (!is_string($contents) || !strlen($contents)) {
+							  $contents = '';
+						  }
+					 
+						  $message = $contents;
+					 
+						  $message = str_replace("_@feeds@_",$email_data, $message);
+						  $message = str_replace("_@feed_category@_",$feed_category_name, $message);
+						  $message = str_replace("_@name@_",$feed_user_name, $message);
+						  $message = str_replace("_@year@_",date('Y'), $message);
+						  
+						  $msgHeaders = "";
+						  $msgHeaders .= "From:Alert Eye <alerteye@paperplane.net>\r\n";
+						  $msgHeaders .= "MIME-Version: 1.0\r\n";
+						  $msgHeaders .= "Content-Type: text/html; charset=utf-8\r\n";
+						  
+						  mail($to, $subject, $message, $msgHeaders);
+						  
+						  //$feeds_obj->update_feed_status($feed_category_id);
+					 
+						  echo $message;
+					}
 			   }
  		  }
  	 }		

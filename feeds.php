@@ -23,7 +23,7 @@ class feeds {
    
    function check_alert_is_updated($alert_id, $alert_updated_date)
    {
-	   $stmt = $this->connection->prepare("SELECT alert_id FROM alerts WHERE alert_updated_date > '0000-00-00 00:00:00' AND alert_updated_date < ? AND alert_id=?");
+	   $stmt = $this->connection->prepare("SELECT alert_id FROM alerts WHERE alert_updated_date >= '0000-00-00 00:00:00' AND alert_updated_date < ? AND alert_id=?");
 	   $stmt->bindValue(1, $alert_updated_date, PDO::PARAM_STR);
 	   $stmt->bindValue(2, $alert_id, PDO::PARAM_INT);
 	   $stmt->execute();
@@ -142,14 +142,38 @@ class feeds {
        }
    }
 
-   function trigger_alert_email($feed_category_id)
-	{
-		$stmt = $this->connection->prepare("SELECT feeds.feed_category_name, feeds.feed_title, feeds.feed_link, feeds.feed_content feed_users.feed_user_name, feed_users.feed_user_email FROM feeds feeds, feed_category feed_category, feed_users feed_users WHERE feeds.feed_category_id = feed_category.feed_category_id AND feed_category.feed_category_id = feed_users.feed_category_id AND feed_category.feed_category_id=?");
-			$stmt->bindValue(1, $feed_category_id, PDO::PARAM_INT);
-			$stmt->execute();
-			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			return $rows;
-	}
+   
+   
+   function get_all_feeds_per_category($feed_category_id)
+   {
+	   $stmt = $this->connection->prepare("SELECT feeds.feed_category_name, feeds.feed_title, feeds.feed_link, feeds.feed_content, feed_users.feed_user_name, feed_users.feed_user_email, feeds.keyword_match, feeds.feed_priority FROM feeds feeds, feed_category feed_category, feed_users feed_users WHERE feeds.feed_category_id = feed_category.feed_category_id AND feed_category.feed_category_id = feed_users.feed_category_id AND feeds.is_new=1 AND feed_category.feed_category_id=? ORDER BY feeds.feed_priority");
+	   $stmt->bindValue(1, $feed_category_id, PDO::PARAM_INT);
+	   $stmt->execute();
+	   $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	   return $rows;
+   }
+   
+   
+   
+   function get_all_feeds_per_alert($alert_id)
+   {
+       $stmt = $this->connection->prepare("SELECT feed.feed_title, feed.feed_link, feed.feed_content, feed.keyword_match, feed.feed_priority FROM feeds feed WHERE feed.alert_id=? AND is_new=1 ORDER BY feed.feed_priority");
+	   $stmt->bindValue(1, $alert_id, PDO::PARAM_INT);
+	   $stmt->execute();
+	   $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	   return $rows;
+   }
+   
+   
+   function update_feed_status($feed_category_id)
+   {
+        $stmt = $this->connection->prepare("UPDATE feeds SET is_new=? WHERE feed_category_id=?");
+        $stmt->bindValue(1, 0, PDO::PARAM_INT);
+        $stmt->bindValue(2, $feed_category_id, PDO::PARAM_INT);
+		$stmt->execute();
+		$affected_rows = $stmt->rowCount();
+		return $affected_rows;
+   }
 
 
 }
