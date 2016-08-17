@@ -29,6 +29,15 @@ class feeds {
 	  return $rows;
    }
 
+   function trigger_alert_email($feed_category_id)
+	{
+		$stmt = $this->connection->prepare("SELECT feeds.feed_category_name, feeds.feed_title, feeds.feed_link, feeds.feed_content feed_users.feed_user_name, feed_users.feed_user_email FROM feeds feeds, feed_category feed_category, feed_users feed_users WHERE feeds.feed_category_id = feed_category.feed_category_id AND feed_category.feed_category_id = feed_users.feed_category_id AND feed_category.feed_category_id=?");
+			$stmt->bindValue(1, $feed_category_id, PDO::PARAM_INT);
+			$stmt->execute();
+			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			return $rows;
+	}
+
 
 }
 
