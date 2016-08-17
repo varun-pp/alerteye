@@ -26,6 +26,14 @@
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		return $rows;
 	}
+	
+	function get_feed_keywords($alert_id)
+	{
+	   $stmt = $this->connection->prepare("SELECT feed_keyword, feed_keyword_priority FROM feed_keyword ORDER BY feed_keyword_priority");
+	   $stmt->execute();
+	   $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	   return $rows;
+	}
 		 
  }
 ?>
