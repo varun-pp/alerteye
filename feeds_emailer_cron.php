@@ -184,7 +184,7 @@
 											   }
 								  
 											   $email_data .= '<tr>
-																   <td style="padding-bottom: 4px; font-weight: normal; font-size: 11px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold;">'.$count.'.</span>'.$feed_content.'</td>
+																   <td style="padding-bottom: 4px; font-weight: normal; font-size: 12px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold; font-size:12px;">'.$count.'.</span>'.$feed_content.'</td>
 															   </tr>
 
 															   <tr>
@@ -192,7 +192,7 @@
 															   </tr>';
 													  
 											   $email_entire_data .= '<tr>
-																		  <td style="padding-bottom: 4px; font-weight: normal; font-size: 11px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold;">'.$count.'.</span>'.$feed_content.'</td>
+																		  <td style="padding-bottom: 4px; font-weight: normal; font-size: 12px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold; font-size:12px;">'.$count.'.</span>'.$feed_content.'</td>
 																	  </tr>
 
 																	  <tr>
