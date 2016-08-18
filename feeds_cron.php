@@ -1,5 +1,5 @@
 <?php
-
+    
     include_once("feeds.php");
     include_once("database.php");
 	
@@ -11,13 +11,14 @@
 	$feed_user_name = '';
 	$feed_user_email = '';
 	
+	$email_entire_data = '';
+	
 	$domain_name = '192.168.0.54:8093';
  	
  	$categories = $db_obj->get_all_feed_category();
  	
  	if(isset($categories) && count($categories) > 0)
  	{
-		 $email_entire_data = '';
 		 foreach($categories as $category)
 		 {
 			   $email_data = '';
@@ -143,7 +144,7 @@
 			        $feed_user_email = $feed_category_user[0]['feed_user_email'];
 			        
 			        $email_entire_data .= '<tr>
-											  <td style="padding-top:15px; padding-bottom: 2px; font-weight: bold; font-size: 30px; line-height: 24px; font-family: Arial; color: #211a0f;">'.$feed_category_name.'</td>
+											  <td style="padding-top:15px; padding-bottom: 7px; font-weight: bold; font-size: 32px; line-height: 24px; font-family: Arial; color: #211a0f;">'.$feed_category_name.'</td>
 										  </tr>';
 				    $email_entire_data .= '<tr>
 											  <td style="padding-bottom: 10px;">';						  
@@ -160,12 +161,12 @@
 						  {
 								$email_data .= '<table border="0" cellspacing="0" cellpadding="0">';
 								   $email_data .= '<tr>
-													   <td style="padding-bottom: 10px; font-weight: bold; font-size: 17px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
+													   <td style="padding-bottom: 10px; font-weight: bold; font-size: 20px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
 												   </tr>';
 												   
 							    $email_entire_data .= '<table border="0" cellspacing="0" cellpadding="0">';
 								   $email_entire_data .= '<tr>
-															  <td style="padding-bottom: 10px; font-weight: bold; font-size: 17px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
+															  <td style="padding-bottom: 10px; font-weight: bold; font-size: 20px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
 														  </tr>';					   
 								
 								$count = 1;
@@ -184,15 +185,24 @@
 									  }
 								  
 									  $email_data .= '<tr>
-														  <td style="padding-bottom: 4px; font-weight: normal; font-size: 12px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold; font-size:12px;">'.$count.'.</span>'.$feed_content.'</td>
+														 <td style="padding-bottom: 4px; font-weight: normal; font-size: 13px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.';font-weight:bold;"><span style="color:#000000; padding-right:5px; font-weight:bold; font-size:12px;">'.$count.'.</span>'.$feed_title.'</td>
+													 </tr>';
+									  $email_data .= '<tr>
+														  <td style="padding-bottom: 4px; font-weight: normal; font-size: 12px; line-height: 14px;  font-family: Arial; color: #757067; padding-top:10px;">'.$feed_content.'</td>
 													  </tr>
 
 													  <tr>
 														  <td style="padding-bottom: 10px; color: #d7d1c7;"><a href="'.$feed_link.'" target="_blank" style="font-weight: normal; font-size: 11px; line-height: 15px; font-family: Arial; color: #b18910; text-transform: uppercase; text-decoration: none;">VIEW DETAILS</a></td>
 													  </tr>';
 													  
+									  
+									  
 									  $email_entire_data .= '<tr>
-																 <td style="padding-bottom: 4px; font-weight: normal; font-size: 12px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold; font-size:12px;">'.$count.'.</span>'.$feed_content.'</td>
+																<td style="padding-bottom: 4px; font-weight: normal; font-size: 13px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.';font-weight:bold;"><span style="color:#000000; padding-right:5px; font-weight:bold; font-size:12px;">'.$count.'.</span>'.$feed_title.'</td>
+															</tr>';
+									  
+									  $email_entire_data .= '<tr>
+																 <td style="padding-bottom: 4px; font-weight: normal; font-size: 12px; line-height: 14px;  font-family: Arial; color: #757067;  padding-top:10px">'.$feed_content.'</td>
 															 </tr>
 
 															 <tr>
@@ -242,53 +252,55 @@
 						  $msgHeaders .= "MIME-Version: 1.0\r\n";
 						  $msgHeaders .= "Content-Type: text/html; charset=utf-8\r\n";
 						  
-						  //mail($to, $subject, $message, $msgHeaders);
+						  mail($to, $subject, $message, $msgHeaders);
 						  
-						  //$feeds_obj->update_feed_status($feed_category_id);
+						  $feeds_obj->update_feed_status($feed_category_id);
 					 
-						  echo $message;
+						  //echo $message;
 					}
 			   }
  		  }
- 		  
- 		  if($email_entire_data != '')
-		  {
-				$to = 'tech@paperplane.net';
-				$subject = 'Alerts';
-				
-				$url = $domain_name."/emailer/emailer-tech.html";
-				$ch = curl_init();
-				curl_setopt ($ch, CURLOPT_URL, $url);
-				curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
-				curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-				$entire_contents = curl_exec($ch);
-				if (curl_errno($ch)) {
-					$entire_contents = '';
-				} else {
-					curl_close($ch);
-				}
-
-				if (!is_string($entire_contents) || !strlen($entire_contents)) {
-					$entire_contents = '';
-				}
-		   
-				$entire_message = $entire_contents;
-		   
-				$entire_message = str_replace("_@entire_feeds@_",$email_entire_data, $entire_message);
-				$entire_message = str_replace("_@name@_",'Tech', $entire_message);
-				$entire_message = str_replace("_@year@_",date('Y'), $entire_message);
-				
-				$msgHeaders = "";
-				$msgHeaders .= "From:Alert Eye <alerteye@paperplane.net>\r\n";
-				$msgHeaders .= "MIME-Version: 1.0\r\n";
-				$msgHeaders .= "Content-Type: text/html; charset=utf-8\r\n";
-				
-				//mail($to, $subject, $message, $msgHeaders);
-				
-				//$feeds_obj->update_feed_status($feed_category_id);
-		   
-				//echo $entire_message;
+ 	}
+ 	
+ 	sleep(3);
+ 	
+ 	if($email_entire_data != '')
+	{
+		  echo $db_obj->send_email("tech@paperplane.net", "Alerts", $email_entire_data);
+		  
+		  /*echo $email_entire_data;
+		  $to = 'varun@paperplane.net';
+		  $subject = 'Alerts';
+		  
+		  $url = $domain_name."/emailer/emailer-tech.html";
+		  $ch = curl_init();
+		  curl_setopt ($ch, CURLOPT_URL, $url);
+		  curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		  curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+		  $entire_contents = curl_exec($ch);
+		  if (curl_errno($ch)) {
+			  $entire_contents = '';
+		  } else {
+			  curl_close($ch);
 		  }
- 	 }	
+
+		  if (!is_string($entire_contents) || !strlen($entire_contents)) {
+			  $entire_contents = '';
+		  }
+	 
+		  $entire_message = $entire_contents;
+	 
+		  $entire_message = str_replace("_@entire_feeds@_",$email_entire_data, $entire_message);
+		  $entire_message = str_replace("_@name@_",'Tech', $entire_message);
+		  $entire_message = str_replace("_@year@_",date('Y'), $entire_message);
+		  
+		  $msgHeaders = "";
+		  $msgHeaders .= "From:Alert Eye <alerteye@paperplane.net>\r\n";
+		  $msgHeaders .= "MIME-Version: 1.0\r\n";
+		  $msgHeaders .= "Content-Type: text/html; charset=utf-8\r\n";
+		  
+		  mail($to, $subject, 'Hii');
+		  //echo $entire_message;*/
+	}	
  	 
 ?>
