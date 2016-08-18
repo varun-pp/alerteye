@@ -30,7 +30,7 @@
 			   $feed_alerts = $db_obj->get_feed_alerts($feed_category_id);
 			   $feed_alert_count = count($feed_alerts);
 			 
-			   if(isset($feed_alerts) && count($feed_alerts) > 0)
+			   /*if(isset($feed_alerts) && count($feed_alerts) > 0)
 			   {
 					 foreach($feed_alerts as $alert)
 					 {
@@ -134,7 +134,7 @@
 								   }
 							}
 					  }
-			   }
+			   }*/
 			   
 			   if(isset($feed_alerts) && count($feed_alerts) > 0)
 			   {
@@ -148,66 +148,66 @@
 				    $email_entire_data .= '<tr>
 											  <td style="padding-bottom: 10px;">';						  
 			        
-			        foreach($feed_alerts as $alert)
-			        {
-						  $alert_id = $alert['alert_id'];
-						  $alert_url = $alert['alert_url'];
-						  $alert_url_title = $alert['alert_url_title'];
+							 foreach($feed_alerts as $alert)
+							 {
+								   $alert_id = $alert['alert_id'];
+								   $alert_url = $alert['alert_url'];
+								   $alert_url_title = $alert['alert_url_title'];
 						
-						  $new_feeds = $feeds_obj->get_all_feeds_per_alert($alert_id);
+								   $new_feeds = $feeds_obj->get_all_feeds_per_alert($alert_id);
 						  
-						  if(isset($new_feeds) && count($new_feeds) > 0)
-						  {
-								$email_data .= '<table border="0" cellspacing="0" cellpadding="0">';
-								   $email_data .= '<tr>
-													   <td style="padding-bottom: 10px; font-weight: bold; font-size: 17px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
-												   </tr>';
+								   if(isset($new_feeds) && count($new_feeds) > 0)
+								   {
+										 $email_data .= '<table border="0" cellspacing="0" cellpadding="0">';
+											$email_data .= '<tr>
+																<td style="padding-bottom: 10px; font-weight: bold; font-size: 17px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
+															</tr>';
 												   
-							    $email_entire_data .= '<table border="0" cellspacing="0" cellpadding="0">';
-								   $email_entire_data .= '<tr>
-															  <td style="padding-bottom: 10px; font-weight: bold; font-size: 17px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
-														  </tr>';					   
+										 $email_entire_data .= '<table border="0" cellspacing="0" cellpadding="0">';
+											$email_entire_data .= '<tr>
+																	   <td style="padding-bottom: 10px; font-weight: bold; font-size: 17px; line-height: 18px;  font-family: Arial; color: #757067; padding-top:12px;">'.$alert_url_title.'</td>
+																   </tr>';					   
 								
-								$count = 1;
-								foreach($new_feeds as $feeds)
-								{
-									  $feed_title = $feeds['feed_title'];
-									  $link = explode("&", $feeds['feed_link'])[2];
-									  $feed_link = explode("=", $link)[1];
-									  $feed_content = $feeds['feed_content'];
-									  $keyword_match = $feeds['keyword_match'];
+										 $count = 1;
+										 foreach($new_feeds as $feeds)
+										 {
+											   $feed_title = $feeds['feed_title'];
+											   $link = explode("&", $feeds['feed_link'])[2];
+											   $feed_link = explode("=", $link)[1];
+											   $feed_content = $feeds['feed_content'];
+											   $keyword_match = $feeds['keyword_match'];
 								  
-									  $color = '';
-									  if($keyword_match == 1)
-									  {
-										$color = "red";
-									  }
+											   $color = '';
+											   if($keyword_match == 1)
+											   {
+												 $color = "red";
+											   }
 								  
-									  $email_data .= '<tr>
-														  <td style="padding-bottom: 4px; font-weight: normal; font-size: 11px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold;">'.$count.'.</span>'.$feed_content.'</td>
-													  </tr>
+											   $email_data .= '<tr>
+																   <td style="padding-bottom: 4px; font-weight: normal; font-size: 11px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold;">'.$count.'.</span>'.$feed_content.'</td>
+															   </tr>
 
-													  <tr>
-														  <td style="padding-bottom: 10px; color: #d7d1c7;"><a href="'.$feed_link.'" target="_blank" style="font-weight: normal; font-size: 11px; line-height: 15px; font-family: Arial; color: #b18910; text-transform: uppercase; text-decoration: none;">VIEW DETAILS</a></td>
-													  </tr>';
+															   <tr>
+																   <td style="padding-bottom: 10px; color: #d7d1c7;"><a href="'.$feed_link.'" target="_blank" style="font-weight: normal; font-size: 11px; line-height: 15px; font-family: Arial; color: #b18910; text-transform: uppercase; text-decoration: none;">VIEW DETAILS</a></td>
+															   </tr>';
 													  
-									  $email_entire_data .= '<tr>
-																 <td style="padding-bottom: 4px; font-weight: normal; font-size: 11px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold;">'.$count.'.</span>'.$feed_content.'</td>
-															 </tr>
+											   $email_entire_data .= '<tr>
+																		  <td style="padding-bottom: 4px; font-weight: normal; font-size: 11px; line-height: 14px;  font-family: Arial; color: #757067; color:'.$color.'"><span style="color:#000000; padding-right:5px; font-weight:bold;">'.$count.'.</span>'.$feed_content.'</td>
+																	  </tr>
 
-															 <tr>
-																 <td style="padding-bottom: 10px; color: #d7d1c7;"><a href="'.$feed_link.'" target="_blank" style="font-weight: normal; font-size: 11px; line-height: 15px; font-family: Arial; color: #b18910; text-transform: uppercase; text-decoration: none;">VIEW DETAILS</a></td>
-															 </tr>';				  
-								  $count++;
-								}
+																	  <tr>
+																		  <td style="padding-bottom: 10px; color: #d7d1c7;"><a href="'.$feed_link.'" target="_blank" style="font-weight: normal; font-size: 11px; line-height: 15px; font-family: Arial; color: #b18910; text-transform: uppercase; text-decoration: none;">VIEW DETAILS</a></td>
+																	  </tr>';				  
+										   $count++;
+										 }
 								
-								$email_data .= '</table>';
-								$email_entire_data .= '</table>';
-						  }
-			        }
+										 $email_data .= '</table>';
+										 $email_entire_data .= '</table>';
+								   }
+							 }
 			        
-			          $email_entire_data .= '</td>
-										  </tr>';
+					$email_entire_data .= '</td>
+										</tr>';
 			        
 			        if($email_data != '')
 					{
@@ -242,7 +242,7 @@
 						  $msgHeaders .= "MIME-Version: 1.0\r\n";
 						  $msgHeaders .= "Content-Type: text/html; charset=utf-8\r\n";
 						  
-						  //mail($to, $subject, $message, $msgHeaders);
+						  mail($to, $subject, $message, $msgHeaders);
 						  
 						  //$feeds_obj->update_feed_status($feed_category_id);
 					 
@@ -283,7 +283,7 @@
 				$msgHeaders .= "MIME-Version: 1.0\r\n";
 				$msgHeaders .= "Content-Type: text/html; charset=utf-8\r\n";
 				
-				//mail($to, $subject, $message, $msgHeaders);
+				mail($to, $subject, $message, $msgHeaders);
 				
 				//$feeds_obj->update_feed_status($feed_category_id);
 		   
