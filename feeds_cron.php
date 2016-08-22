@@ -85,7 +85,7 @@
 											   
 											   if($keyword == 'Deprecat')
 											   {
-											      if(preg_match("/\bDeprecat[a-zA-Z]\b/i", addslashes($feed_content), $match))
+											      if(preg_match("/\bDeprecat[a-zA-Z]\b/i", addslashes($feed_content), $match) || preg_match("/\bDeprecat[a-zA-Z]\b/i", addslashes($feed_title), $match))
 											      {
 											         $feed_priority = $keyword_priority;
 													 $keyword_match = 1;
@@ -94,7 +94,7 @@
 											   }
 											   else if($keyword == 'v')
 											   {
-											       if(preg_match("/\bv[\d]\b/i", addslashes($feed_content), $match))
+											       if(preg_match("/\bv[\d]\b/i", addslashes($feed_content), $match) || preg_match("/\bv[\d]\b/i", addslashes($feed_title), $match))
 											       {
 											          $feed_priority = $keyword_priority;
 													  $keyword_match = 1;
@@ -103,7 +103,7 @@
 											   }
 											   else
 											   {
-												   if(strpos(strtolower(addslashes($feed_content)), $keyword) !== false)
+												   if(strpos(strtolower(addslashes($feed_content)), $keyword) !== false || strpos(strtolower(addslashes($feed_title)), $keyword) !== false)
 												   {
 													  $feed_priority = $keyword_priority;
 													  $keyword_match = 1;
@@ -256,7 +256,7 @@
 						  
 						  $feeds_obj->update_feed_status($feed_category_id);
 					 
-						  //echo $message;
+						  echo $message;
 					}
 			   }
  		  }
